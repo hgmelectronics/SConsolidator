@@ -79,7 +79,7 @@ def collect_sys_includes(lang, environ):
                     [get_compiler(environ), '-v', get_gcc_lang_param(lang)] + get_compiler_flags(lang, environ) + [in_path, '-o', out_path],
                     stdin='devnull', stderr=subprocess.PIPE, stdout=subprocess.PIPE)
                 (_, perr) = process.communicate()
-                return perr.decode()
+                return perr
 
     def parse_includes(cc_output):
         cc_output = cc_output.replace('\r', '')
@@ -160,7 +160,7 @@ def collect_sys_macros(lang, environ):
     (pout, _) = process.communicate()
     sysmacros = set()
 
-    for it in re.finditer('^#define (.*) (.*)$', pout.decode(), re.M):
+    for it in re.finditer('^#define ([a-zA-Z0-9_]*(?:\(.*\))?) (.*)$', pout, re.M):
         sysmacros.add('%s=%s' % (it.groups()[0], it.groups()[1].strip()))
     return sysmacros
 
@@ -183,7 +183,6 @@ def write_build_infos(includes, macros, environ):
                 strings.append("'%s'" % '='.join(obj))
             else:
                 strings.append("'%s'" % obj)
-        strings.sort()
         return ','.join([environ.subst(string) for string in strings])
 
     print('USER_INCLUDES = [%s]' % to_string(includes, environ))

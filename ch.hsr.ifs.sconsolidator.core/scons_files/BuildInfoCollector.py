@@ -52,7 +52,7 @@ def get_gcc_lang_param(lang):
 def collect_sys_includes(lang, environ):
 
     def write_cpp_main(f, lang):
-        f.write('#include <%s>\n#ifdef __cplusplus\nextern "C"\n#endif\nvoid _exit(int status) { while(1); }\nint main(){}' % 
+        f.write('#include <%s>\n#ifdef __cplusplus\nextern "C"\n#endif\nvoid _exit(int status) { while(1); }\nint main(){}' %
             (('cstdlib' if lang == 'c++' else 'stdlib.h')))
         f.flush()
 
@@ -121,11 +121,11 @@ def get_compiler(environ):
         # console, we need to take the 'real' executables here
         return which('g++-4') or which('g++-3')
     else:
-        return environ['CXX'] 
+        return environ['CXX']
 
 
 def collect_macros_from_cpp_defines(environ):
-    
+
     def macro_binding(macro, value):
         return '{macro}={value}'.format(**locals())
 
@@ -152,7 +152,7 @@ def collect_macros_from_cpp_defines(environ):
 
 
 def collect_macros_from_cc_flags(environ):
-    return set(flag[2:] for flag in environ['CCFLAGS'] 
+    return set(flag[2:] for flag in environ['CCFLAGS']
             if flag is not None and isinstance(flag, str) and flag.startswith('-D'))
 
 
@@ -170,7 +170,7 @@ def collect_sys_macros(lang, environ):
         pout = pout.decode()
     except AttributeError:
         pass
-    for it in re.finditer('^#define (.*) (.*)$', pout, re.M):
+    for it in re.finditer('^#define ([a-zA-Z0-9_]*(?:\(.*\))?) (.*)$', pout, re.M):
         sysmacros.add('%s=%s' % (it.groups()[0], it.groups()[1].strip()))
     return sysmacros
 

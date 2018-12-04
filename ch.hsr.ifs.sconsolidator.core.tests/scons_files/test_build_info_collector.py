@@ -2,7 +2,7 @@ import unittest
 import os
 import subprocess
 import shutil
-
+import sys
 
 def collect_infos(project_dir):
     
@@ -34,7 +34,8 @@ def collect_infos(project_dir):
         shutil.copy2(extractor_path, '.')
         p = (subprocess.Popen(['scons', '-u', '-s', '-f', 'SConstruct', '-f', BUILD_INFO_COLLECTOR], 
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT))
+            stderr=subprocess.STDOUT,
+            shell=(sys.platform == 'win32')))
         stdout, _ = p.communicate()
         os.remove(BUILD_INFO_COLLECTOR)
         return parse(stdout.splitlines())

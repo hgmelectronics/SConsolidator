@@ -5,6 +5,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.cdtvariables.CdtVariableException;
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.core.settings.model.ICProjectDescription;
+import org.eclipse.core.resources.IProject;
+
 public final class PlatformSpecifics {
   public static final String NEW_LINE = System.getProperty("line.separator");
   public static final Pattern CPP_RE = Pattern.compile("(.+?(?:\\.(?:cpp|c|cc|C|cxx|h|hxx|hpp|ipp)))[:(]?([\\d]+)[)]?");
@@ -52,7 +59,7 @@ public final class PlatformSpecifics {
     return System.getenv();
   }
 
-  public static String expandEnvVariables(String toExpand) {
+  static String expandEnvVariables(String toExpand, boolean keepInvalid) {
     Pattern envVarRe = Pattern.compile("\\$\\{([A-Za-z0-9_]+)\\}");
     Matcher matcher = envVarRe.matcher(toExpand);
     Map<String, String> env = getSystemEnv();
@@ -61,6 +68,9 @@ public final class PlatformSpecifics {
       String envVal = env.get(matcher.group(1).toUpperCase());
 
       if (envVal == null) {
+        if (keepInvalid) {
+          continue;
+        }
         envVal = "";
       } else {
         envVal = envVal.replace("\\", "\\\\");
@@ -68,6 +78,25 @@ public final class PlatformSpecifics {
 
       Pattern subExp = Pattern.compile(Pattern.quote(matcher.group(0)));
       toExpand = subExp.matcher(toExpand).replaceAll(envVal);
+    }
+    return toExpand;
+  }
+
+  public static String expandEnvVariables(String toExpand) {
+    return expandEnvVariables(toExpand, false);
+  }
+
+  public static String expandEnvAndBuildVariables(String toExpand, IProject project) {
+    toExpand = expandEnvVariables(toExpand, true);
+
+    ICProjectDescription projDescription = CoreModel.getDefault().getProjectDescription(project);
+    if (projDescription != null) {
+      ICConfigurationDescription cfg = projDescription.getActiveConfiguration();
+      try {
+        toExpand = CCorePlugin.getDefault().getCdtVariableManager().resolveValue(toExpand, "", null, cfg);
+      } catch (CdtVariableException e) {
+        e.printStackTrace();
+      }
     }
     return toExpand;
   }

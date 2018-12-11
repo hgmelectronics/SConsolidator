@@ -55,7 +55,7 @@ public class SConsTwoStepBuild {
 
   private void initAdditionalSConsOptions() {
     String options =
-        PlatformSpecifics.expandEnvVariables(activePrefs.getString(ADDITIONAL_COMMANDLINE_OPTIONS));
+      PlatformSpecifics.expandEnvAndBuildVariables(activePrefs.getString(ADDITIONAL_COMMANDLINE_OPTIONS), project);
     twoStepArgs.addAll(StringUtil.split(options));
   }
 

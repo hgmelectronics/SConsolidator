@@ -38,7 +38,7 @@ import ch.hsr.ifs.sconsolidator.core.base.utils.TeeOutputStream;
 import ch.hsr.ifs.sconsolidator.core.commands.SConsConsole.ConsoleOutput;
 
 abstract class SConsCommand {
-  private static final String SCONS_COMMANDS_NOT_EXECUTED = "-n";
+  private static final String SCONS_COMMANDS_NOT_EXECUTED = "-n"; 
   private static final int SLEEP_TIME_MS = 100;
   private final SConsConsole console;
   private final String[] defaultArguments;
@@ -124,7 +124,7 @@ abstract class SConsCommand {
       Thread.sleep(SLEEP_TIME_MS);
       if (pm.isCanceled()) {
         watchdog.destroyProcess();
-        throw new InterruptedException("Process manually killed");
+        throw new InterruptedException("Process manually killed"); 
       }
     }
   }
@@ -159,7 +159,7 @@ abstract class SConsCommand {
       return sysEnv;
 
     for (String option : StringUtil.split(getProjectEnvOptions())) {
-      String[] splitted = option.split("=");
+      String[] splitted = option.split("="); 
 
       if (splitted.length == 2) {
         String expandedVal = PlatformSpecifics.expandEnvAndBuildVariables(splitted[1], project);
@@ -202,10 +202,10 @@ abstract class SConsCommand {
   }
 
   private String getConsoleColorInfo() {
-    return NLS.bind(SConsI18N.AbstractSConsCommand_ConsoleColorInfo,
+    return NLS.bind(SConsI18N.AbstractSConsCommand_ConsoleColorInfo, 
                   SConsI18N.AbstractSConsCommand_ConsoleColorInfoLinkText);
   }
-
+  
   private String getCommandLine() {
     return NLS.bind(SConsI18N.AbstractSConsCommand_CommandLinePrefix, cmdLine.toString());
   }
@@ -231,9 +231,9 @@ abstract class SConsCommand {
       processStdErr.close();
     }
     printCommandDurationOnConsole();
-    // we have to defer linking to the build console preference page because if we do it right
+    // we have to defer linking to the build console preference page because if we do it right 
     // away the link is not always rendered
-    console.addBuildConsoleColorLink();
+    console.addBuildConsoleColorLink(); 
   }
 
   private void raiseProblemIfNecessary(int exitValue, Exception e) {
